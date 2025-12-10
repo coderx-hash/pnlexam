@@ -319,6 +319,27 @@
         <div class="orb orb-2"></div>
     </div>
 
+    <div id="view-popout" class="modal-overlay hidden fade-in" style="z-index: 2000;">
+        <div class="card modal-box" style="border-top: 4px solid var(--accent); max-width: 450px;">
+            <div style="text-align: right;">
+                <button onclick="closePopout()" class="btn btn-ghost" style="padding: 5px; font-size: 1.2rem;">&times;</button>
+            </div>
+            
+            <div style="margin-top: -20px; margin-bottom: 20px;">
+                <div style="width: 60px; height: 60px; background: rgba(244, 63, 94, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                    <i class='bx bxs-bulb' style="font-size: 2rem; color: var(--accent);"></i>
+                </div>
+                <h3 style="color: var(--accent); font-family: var(--font-mono); letter-spacing: 1px;">DID YOU KNOW?</h3>
+            </div>
+
+            <div id="popout-content" style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 12px; border: 1px solid var(--glass-border); text-align: left; margin-bottom: 20px;">
+                <h4 id="fact-title" style="color: white; margin-bottom: 8px;">Title Here</h4>
+                <p id="fact-body" style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">Body here...</p>
+            </div>
+
+            <button onclick="closePopout()" class="btn btn-primary" style="width: 100%; background: var(--accent); border-color: var(--accent);">Got it! <i class='bx bx-check'></i></button>
+        </div>
+    </div>
     <div id="trial-banner" class="trial-banner hidden">
         FREE TRIAL MODE: <span id="trial-timer-val">60</span>s REMAINING
     </div>
@@ -748,6 +769,82 @@
             "The PRC License is earned, not given. Keep grinding.",
             "Focus. Review. Pray. Repeat."
         ];
+
+        // --- DID YOU KNOW / POP OUT FEATURE ---
+
+        // 1. Database ng Mnemonics at Values (Pwede mo dagdagan)
+        const nursingFacts = [
+            {
+                title: "🚑 MNEMONIC: MONA (MI Management)",
+                body: "Para sa Myocardial Infarction: <br><b>M</b> - Morphine<br><b>O</b> - Oxygen<br><b>N</b> - Nitroglycerin<br><b>A</b> - Aspirin"
+            },
+            {
+                title: "🩸 Normal Lab Value: Potassium (K+)",
+                body: "Normal Range: <b>3.5 - 5.0 mEq/L</b>.<br>Hypokalemia: Muscle cramps, arrhythmias.<br>Hyperkalemia: Cardiac arrest (Tall T-waves)."
+            },
+            {
+                title: "👶 MNEMONIC: APGAR Score",
+                body: "Assessed at 1 min & 5 mins:<br><b>A</b> - Appearance (Color)<br><b>P</b> - Pulse (HR)<br><b>G</b> - Grimace (Reflex)<br><b>A</b> - Activity (Muscle Tone)<br><b>R</b> - Respiration"
+            },
+            {
+                title: "🧠 Cranial Nerves (Sensory/Motor)",
+                body: "<b>S</b>ome <b>S</b>ay <b>M</b>arry <b>M</b>oney <b>B</b>ut <b>M</b>y <b>B</b>rother <b>S</b>ays <b>B</b>ad <b>B</b>usiness <b>M</b>arry <b>M</b>oney.<br>(S=Sensory, M=Motor, B=Both)"
+            },
+            {
+                title: "💉 Normal Value: pH of Blood",
+                body: "Normal Range: <b>7.35 - 7.45</b>.<br>Below 7.35 = Acidosis<br>Above 7.45 = Alkalosis"
+            },
+            {
+                title: "🔥 MNEMONIC: RACE (Fire Safety)",
+                body: "<b>R</b> - Rescue patient<br><b>A</b> - Alarm (Activate)<br><b>C</b> - Contain (Close doors)<br><b>E</b> - Extinguish/Evacuate"
+            },
+            {
+                title: "💊 Digoxin Toxicity",
+                body: "Therapeutic Level: <b>0.5 - 2.0 ng/mL</b>.<br>Early sign of toxicity: Anorexia, Nausea, Vomiting.<br>Classic sign: Halos around lights (Yellow/Green vision)."
+            },
+            {
+                title: "🦴 MNEMONIC: RICE (Sprain/Strain)",
+                body: "<b>R</b> - Rest<br><b>I</b> - Ice (24-48 hrs)<br><b>C</b> - Compression<br><b>E</b> - Elevation"
+            }
+        ];
+
+        // 2. Logic para ipakita ang Pop-up
+        window.triggerSmartPopout = () => {
+            // Huwag mag pop-out kung nasa gitna ng Quiz o Exam
+            const isQuizActive = !document.getElementById('view-quiz').classList.contains('hidden');
+            if (isQuizActive) {
+                console.log("User is taking a quiz. Pop-out skipped.");
+                return; 
+            }
+
+            // Kumuha ng random fact
+            const randomIndex = Math.floor(Math.random() * nursingFacts.length);
+            const fact = nursingFacts[randomIndex];
+
+            // I-display sa HTML
+            document.getElementById('fact-title').innerHTML = fact.title;
+            document.getElementById('fact-body').innerHTML = fact.body;
+            
+            // I-show ang modal
+            document.getElementById('view-popout').classList.remove('hidden');
+        };
+
+        window.closePopout = () => {
+            document.getElementById('view-popout').classList.add('hidden');
+        };
+
+        // 3. Set Interval (Timer)
+        // 1 Hour = 3600000 milliseconds
+        // Set natin sa 1 hour. Pwede mo palitan to "10000" para mag pop-out every 10 seconds for testing.
+        const POP_OUT_INTERVAL = 10000; 
+
+        setInterval(() => {
+            // Check kung naka-login bago mag pop-out
+            if(currentUserUID && !isTrialMode) {
+                window.triggerSmartPopout();
+            }
+        }, POP_OUT_INTERVAL);
+
 
         // --- AUTH & LOGIC ---
         const loginEmail = document.getElementById('inp-email');
